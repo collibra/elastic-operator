@@ -1,12 +1,14 @@
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: ValidatingWebhookConfiguration
 metadata:
-  name: elastic-webhook.k8s.elastic.co
+  name: {{ include "elastic-operator.fullname" . }}-webhook.k8s.elastic.co
+  labels:
+{{ include "elastic-operator.labels" . | indent 4 }}
 webhooks:
   - clientConfig:
       caBundle: Cg==
       service:
-        name: elastic-webhook-server
+        name: {{ include "elastic-operator.fullname" . }}
         namespace: {{ .Release.Namespace }}
         path: /validate-elasticsearch-k8s-elastic-co-v1-elasticsearch
     failurePolicy: Ignore
@@ -24,7 +26,7 @@ webhooks:
   - clientConfig:
       caBundle: Cg==
       service:
-        name: elastic-webhook-server
+        name: {{ include "elastic-operator.fullname" . }}
         namespace: {{ .Release.Namespace }}
         path: /validate-elasticsearch-k8s-elastic-co-v1beta1-elasticsearch
     failurePolicy: Ignore

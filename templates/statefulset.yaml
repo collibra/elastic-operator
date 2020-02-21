@@ -1,53 +1,107 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: elastic-operator
+  name: {{ include "elastic-operator.fullname" . }}
   labels:
-    control-plane: elastic-operator
+{{ include "elastic-operator.labels" . | indent 4 }}
+  {{- with .Values.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.annotations }}
+  annotations:
+    {{- with .Values.annotations }}
+    {{- range $key, $value := . }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
 spec:
   selector:
     matchLabels:
-      control-plane: elastic-operator
-  serviceName: elastic-operator
+      app.kubernetes.io/name: {{ include "elastic-operator.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      control-plane: {{ include "elastic-operator.name" . }}
+  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "elastic-operator.name" . }}
   template:
     metadata:
       labels:
-        control-plane: elastic-operator
+        app.kubernetes.io/name: {{ include "elastic-operator.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        control-plane: {{ include "elastic-operator.name" . }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- if .Values.podAnnotations }}
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- range $key, $value := . }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
     spec:
-      serviceAccountName: elastic-operator
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "elastic-operator.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-      - image: docker.elastic.co/eck/eck-operator:1.0.1
-        name: manager
-        args: ["manager", "--operator-roles", "all", "--log-verbosity=0"]
-        env:
-          - name: OPERATOR_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          - name: WEBHOOK_SECRET
-            value: elastic-webhook-server-cert
-          - name: WEBHOOK_PODS_LABEL
-            value: elastic-operator
-          - name: OPERATOR_IMAGE
-            value: docker.elastic.co/eck/eck-operator:1.0.1
-        resources:
-          limits:
-            cpu: 1
-            memory: 150Mi
-          requests:
-            cpu: 100m
-            memory: 50Mi
-        ports:
-        - containerPort: 9443
-          name: webhook-server
-          protocol: TCP
-        volumeMounts:
-          - mountPath: /tmp/k8s-webhook-server/serving-certs
-            name: cert
-            readOnly: true
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["manager", "--operator-roles", "all"]
+          env:
+            - name: OPERATOR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OPERATOR_IMAGE
+              value: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+            - name: LOG_VERBOSITY
+              value: {{ .Values.operator.logVerbosity | quote }}
+            {{- if .Values.operator.metricsPort }}
+            - name: METRICS_PORT
+              value: {{ .Values.operator.metricsPort | quote}}
+            {{- end }}
+            - name: WEBHOOK_SECRET
+              value: {{ include "elastic-operator.fullname" . }}-webhook-server-cert
+            - name: WEBHOOK_PODS_LABEL
+              value: {{ include "elastic-operator.name" . }}
+          ports:
+            - name: webhook-server
+              containerPort: 9443
+              protocol: TCP
+            {{- if .Values.operator.metricsPort }}
+            - name: metrics
+              containerPort: {{ .Values.operator.metricsPort }}
+              protocol: TCP
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: cert
+              readOnly: true
       terminationGracePeriodSeconds: 10
       volumes:
         - name: cert
           secret:
             defaultMode: 420
-            secretName: elastic-webhook-server-cert
+            secretName: {{ include "elastic-operator.fullname" . }}-webhook-server-cert
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

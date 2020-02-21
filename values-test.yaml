@@ -1,0 +1,58 @@
+replicaCount: 1
+
+image:
+  repository: docker.elastic.co/eck/eck-operator
+  tag: 1.0.1
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: my-short-name
+fullnameOverride: my-full-name
+
+labels:
+  my-label: here
+annotations:
+  my-annotation: there
+
+podLabels:
+  my-label: here-pod
+podAnnotations: 
+  my-annotation: there-pod
+
+operator:
+  logVerbosity: 3
+  metricsPort: 8085
+
+serviceAccount:
+  create: true
+  name: my-service-name
+
+rbac:
+  create: true
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+resources:
+  limits:
+    cpu: 1
+    memory: 150Mi
+  requests:
+    cpu: 100m
+    memory: 50Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

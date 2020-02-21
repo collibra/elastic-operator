@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "elastic-cloud-on-k8s.name" -}}
+{{- define "elastic-operator.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "elastic-cloud-on-k8s.fullname" -}}
+{{- define "elastic-operator.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -27,29 +27,34 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "elastic-cloud-on-k8s.chart" -}}
+{{- define "elastic-operator.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Common labels
 */}}
-{{- define "elastic-cloud-on-k8s.labels" -}}
-app.kubernetes.io/name: {{ include "elastic-cloud-on-k8s.name" . }}
-helm.sh/chart: {{ include "elastic-cloud-on-k8s.chart" . }}
+{{- define "elastic-operator.labels" -}}
+app.kubernetes.io/name: {{ include "elastic-operator.name" . }}
+helm.sh/chart: {{ include "elastic-operator.chart" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/component: elastic-operator
+app.kubernetes.io/part-of: elastic-operator
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels }}
+{{- end }}
 {{- end -}}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "elastic-cloud-on-k8s.serviceAccountName" -}}
+{{- define "elastic-operator.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create -}}
-    {{ default (include "elastic-cloud-on-k8s.fullname" .) .Values.serviceAccount.name }}
+    {{ default (include "elastic-operator.fullname" .) .Values.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
