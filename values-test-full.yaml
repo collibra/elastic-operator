@@ -7,25 +7,29 @@ image:
 
 imagePullSecrets: []
 
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: my-short-name
+fullnameOverride: my-full-name
 
-labels: {}
-annotations: {}
+labels:
+  my-label: here
+annotations:
+  my-annotation: there
 
-podLabels: {}
-podAnnotations: {}
+podLabels:
+  my-label: here-pod
+podAnnotations: 
+  my-annotation: there-pod
 
 operator:
-  logVerbosity: 0
+  logVerbosity: 3
   metricsPort: 8085
 
 serviceAccount:
-  create: false
-  name: ""
+  create: true
+  name: my-service-name
 
 rbac:
-  create: false
+  create: true
 
 podSecurityContext:
   fsGroup: 2000
@@ -41,12 +45,14 @@ securityContext:
 
 resources:
   limits:
-    cpu: 500m
+    cpu: 1
     memory: 150Mi
   requests:
     cpu: 100m
     memory: 50Mi
 
 nodeSelector: {}
+
 tolerations: []
+
 affinity: {}
