@@ -25,7 +25,15 @@ operator:
   # Verbosity level of logs. -2=Error, -1=Warn, 0=Info, 0 and above=Debug
   logVerbosity: 0
   # Prometheus metrics port
-  metricsPort:   
+  metricsPort:
+  # Roles this operator should assume. Valid values are namespace, global, webhook or all. Accepts multiple space separated values.
+  roles: all
+  # roles: namespace global
+
+# Validation of Elasticsearch resources: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-webhook.html
+webhook:
+  # Create the validating webhook. Make sure to also disable this in the operator.roles
+  enabled: true
 
 serviceAccount:
   # Specifies whether a service account should be created

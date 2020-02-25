@@ -19,13 +19,17 @@ podAnnotations: {}
 operator:
   logVerbosity: 0
   metricsPort: 8085
+  roles: namespace global
+
+webhook:
+  enabled: false
 
 serviceAccount:
   create: false
   name: ""
 
 rbac:
-  create: false
+  create: true
 
 podSecurityContext:
   fsGroup: 2000

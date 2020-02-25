@@ -23,6 +23,10 @@ podAnnotations:
 operator:
   logVerbosity: 3
   metricsPort: 8085
+  roles: all
+
+webhook:
+  enabled: true
 
 serviceAccount:
   create: true

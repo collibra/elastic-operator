@@ -54,7 +54,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args: ["manager", "--operator-roles", "all"]
+          args: ["manager"]
           env:
             - name: OPERATOR_NAMESPACE
               valueFrom:
@@ -62,16 +62,18 @@ spec:
                   fieldPath: metadata.namespace
             - name: OPERATOR_IMAGE
               value: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+            - name: OPERATOR_ROLES
+              value: {{ .Values.operator.roles | quote }}
             - name: LOG_VERBOSITY
               value: {{ .Values.operator.logVerbosity | quote }}
             {{- if .Values.operator.metricsPort }}
             - name: METRICS_PORT
               value: {{ .Values.operator.metricsPort | quote}}
             {{- end }}
+            {{- if .Values.webhook.enabled }}
             - name: WEBHOOK_SECRET
               value: {{ include "elastic-operator.fullname" . }}-webhook-server-cert
-            - name: WEBHOOK_PODS_LABEL
-              value: {{ include "elastic-operator.name" . }}
+            {{- end }}
           ports:
             - name: webhook-server
               containerPort: 9443
@@ -84,15 +86,19 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
+            {{- if .Values.webhook.enabled }}
             - mountPath: /tmp/k8s-webhook-server/serving-certs
               name: cert
               readOnly: true
+            {{- end }}
       terminationGracePeriodSeconds: 10
       volumes:
+        {{- if .Values.webhook.enabled }}
         - name: cert
           secret:
             defaultMode: 420
             secretName: {{ include "elastic-operator.fullname" . }}-webhook-server-cert
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
