@@ -1,11 +1,19 @@
+{{- if .Values.webhook.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: elastic-webhook-server
-  namespace: elastic-system
+  name: {{ include "elastic-operator.fullname" . }}
+  labels:
+{{ include "elastic-operator.labels" . | indent 4 }}
 spec:
+  type: ClusterIP
   ports:
-    - port: 443
+    - name: webhook-server
+      port: 443
       targetPort: 9443
+      protocol: TCP
   selector:
-    control-plane: elastic-operator
+    app.kubernetes.io/name: {{ include "elastic-operator.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    control-plane: {{ include "elastic-operator.name" . }}
+{{- end }}

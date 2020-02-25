@@ -1,0 +1,56 @@
+replicaCount: 1
+
+image:
+  repository: docker.elastic.co/eck/eck-operator
+  tag: 1.0.1
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+labels: {}
+annotations: {}
+
+podLabels: {}
+podAnnotations: {}
+
+operator:
+  logVerbosity: 0
+  metricsPort: 8085
+  roles: namespace global
+
+webhook:
+  enabled: false
+
+serviceAccount:
+  create: false
+  name: ""
+
+rbac:
+  create: true
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 150Mi
+  requests:
+    cpu: 100m
+    memory: 50Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

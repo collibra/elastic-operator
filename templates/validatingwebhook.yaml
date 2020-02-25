@@ -1,13 +1,18 @@
+{{- if .Values.webhook.enabled }}
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: ValidatingWebhookConfiguration
 metadata:
+  # This has to be a fixed name for the elastic-operator to work
+  # See: https://github.com/elastic/cloud-on-k8s/blob/f63396e905a2fbaa5f5746fc9655044bddf400f5/cmd/manager/main.go#L60
   name: elastic-webhook.k8s.elastic.co
+  labels:
+{{ include "elastic-operator.labels" . | indent 4 }}
 webhooks:
   - clientConfig:
       caBundle: Cg==
       service:
-        name: elastic-webhook-server
-        namespace: elastic-system
+        name: {{ include "elastic-operator.fullname" . }}
+        namespace: {{ .Release.Namespace }}
         path: /validate-elasticsearch-k8s-elastic-co-v1-elasticsearch
     failurePolicy: Ignore
     name: elastic-es-validation-v1.k8s.elastic.co
@@ -24,8 +29,8 @@ webhooks:
   - clientConfig:
       caBundle: Cg==
       service:
-        name: elastic-webhook-server
-        namespace: elastic-system
+        name: {{ include "elastic-operator.fullname" . }}
+        namespace: {{ .Release.Namespace }}
         path: /validate-elasticsearch-k8s-elastic-co-v1beta1-elasticsearch
     failurePolicy: Ignore
     name: elastic-es-validation-v1beta1.k8s.elastic.co
@@ -39,3 +44,4 @@ webhooks:
           - UPDATE
         resources:
           - elasticsearches
+{{- end }}

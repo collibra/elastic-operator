@@ -25,4 +25,5 @@ spec:
       node.store.allow_mmap: false
 ```
 
+A more complete example can be found [here](./samples/elasticsearch.yaml).
 More info can be found on the offical [quickstart](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-quickstart.html).

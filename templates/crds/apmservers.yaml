@@ -3,8 +3,6 @@ kind: CustomResourceDefinition
 metadata:
   creationTimestamp: null
   name: apmservers.apm.k8s.elastic.co
-  annotations:
-    "helm.sh/hook": "crd-install"
 spec:
   additionalPrinterColumns:
   - JSONPath: .status.health

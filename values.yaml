@@ -1,1 +1,74 @@
-createNamespace: false
+replicaCount: 1
+
+image:
+  repository: docker.elastic.co/eck/eck-operator
+  tag: 1.0.1
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Extra labels to add to statefulset
+labels: {}
+# Extra annotations to add to statefulset
+annotations: {}
+
+# Extra labels to add to pod
+podLabels: {}
+# Extra annotations to add to pod
+podAnnotations: {}
+
+# https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-operator-config.html
+operator:
+  # Verbosity level of logs. -2=Error, -1=Warn, 0=Info, 0 and above=Debug
+  logVerbosity: 0
+  # Prometheus metrics port
+  metricsPort:
+  # Roles this operator should assume. Valid values are namespace, global, webhook or all. Accepts multiple space separated values.
+  roles: all
+  # roles: namespace global
+
+# Validation of Elasticsearch resources: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-webhook.html
+webhook:
+  # Create the validating webhook. Make sure to also disable this in the operator.roles
+  enabled: true
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+rbac:
+  # Specifies whether RBAC should be created
+  # Will bind those to the serviceAccount.name if created/specified or fallback to the default service account
+  create: true
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+  # runAsGroup: 1000
+
+resources: {}
+  # limits:
+  #   cpu: 1
+  #   memory: 150Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 50Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
