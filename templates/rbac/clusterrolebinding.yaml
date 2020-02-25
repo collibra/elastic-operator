@@ -8,7 +8,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ template "elastic-operator.serviceAccountName" . }}
+  name: {{ template "elastic-operator.serviceAccountName" . }}-role
 subjects:
 - kind: ServiceAccount
   name: {{ template "elastic-operator.serviceAccountName" . }}
