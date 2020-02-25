@@ -1,7 +1,9 @@
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: ValidatingWebhookConfiguration
 metadata:
-  name: {{ include "elastic-operator.fullname" . }}-webhook.k8s.elastic.co
+  # This has to be a fixed name for the elastic-operator to work
+  # See: https://github.com/elastic/cloud-on-k8s/blob/f63396e905a2fbaa5f5746fc9655044bddf400f5/cmd/manager/main.go#L60
+  name: elastic-webhook.k8s.elastic.co
   labels:
 {{ include "elastic-operator.labels" . | indent 4 }}
 webhooks:
