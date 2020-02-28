@@ -4,6 +4,8 @@ Helm chart to deploy [ECK operator](https://www.elastic.co/guide/en/cloud-on-k8s
 
 This chart is based on the official Elastic [resource file](https://download.elastic.co/downloads/eck/1.0.1/all-in-one.yaml).
 
+__DISCLAIMER__: This Helm chart is provided as-is and is an alpha version.
+
 ## TL;DR;
 
 ```console
