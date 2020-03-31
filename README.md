@@ -1,16 +1,11 @@
 # Elastic Cloud on Kubernetes Helm chart
 
-Helm chart to deploy [ECK operator](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-overview.html).
+This chart has been cloned from https://github.com/collibra/elastic-operator
+
+This Helm chart is used to deploy [ECK operator](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-overview.html).
 
 This chart is based on the official Elastic [resource file](https://download.elastic.co/downloads/eck/1.0.1/all-in-one.yaml).
 
-__DISCLAIMER__: This Helm chart is provided as-is and is an alpha version.
-
-## TL;DR;
-
-```console
-$ helm install <repo>/elastic-operator
-```
 
 ## Prerequisites
 
@@ -18,26 +13,32 @@ $ helm install <repo>/elastic-operator
 
 See [ECK overview](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-overview.html).
 
-## Installing the Chart
+# Build chart and push to Helm repo
 
-To install the chart with the release name `my-release` and default configuration:
+To delete prior versions from Helm repo
 
-```console
-$ helm install --name my-release <repo>/elastic-operator
-```
+    az acr helm delete elastic-operator
 
-## Uninstalling the Chart
+To delete a specific version from Helm repo
 
-To delete the chart:
+    az acr helm delete elastic-operator --version <version> -n bring
 
-```console
-$ helm delete my-release
-```
+Clear exisitng helm package
 
+    rm -f elastic-operator-*.tgz
+    
+Build the Helm package
+    helm package .
+    
+Push the package to Helm repo
+    
+    az acr helm push elastic-operator-0.2.0.tgz -n bring
+    
+To add Azure Container Registry (bring) to helm repositories
+    
+    az acr helm repo add -n bring
 ## Configuration
-
 The following table lists the configurable parameters of the elastic-operator chart and their default values.
-
 Parameter | Description | Default
 --- | --- | ---
 `replicaCount` | Number of replicas | `1`
@@ -64,17 +65,12 @@ Parameter | Description | Default
 `nodeSelector` | Node labels for pod assignment | `{}`
 `tolerations` | Node taints to tolerate | `[]`
 `affinity` | Pod affinity | `{}`
-
 Specify each parameter you'd like to override using a YAML file as described above in the [installation](#installing-the-chart) section or by using the `--set key=value[,key=value]` argument to `helm install`.
-
 ```console
 $ helm install <repo>/elastic-operator --name my-release --values values.yaml
 ```
-
 ## Creating resources
-
 Once installed you can create Elastic resources. For example, creating an `Elasticsearch` cluster:
-
 ```YAML
 apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
@@ -91,6 +87,5 @@ spec:
       node.ingest: true
       node.store.allow_mmap: false
 ```
-
 A more complete example can be found [here](./samples/elasticsearch.yaml).
 More info can be found on the offical [ECK quickstart](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-quickstart.html).
